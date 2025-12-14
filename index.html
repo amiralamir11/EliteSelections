@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="storeTitle">Walmart Shopping</title>
+    <link rel="icon" id="favicon" href="">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ------------------------------------------------------------------------------------
+           CSS: التنسيقات العامة
+           ------------------------------------------------------------------------------------ */
+        *:focus, a:focus, button:focus { outline: none !important; box-shadow: none !important; }
+        a, button, .like-container { -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0; 
+            padding: 0; 
+            color: #333; 
+            background-color: #FFFFFF; 
+            background-attachment: local;
+            min-height: 100vh;
+        }
+        
+        /* ------------------- زر تبديل اللغة ------------------- */
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            z-index: 100;
+        }
+
+        [dir="rtl"] .language-toggle { right: 20px; left: auto; }
+        [dir="ltr"] .language-toggle { left: 20px; right: auto; }
+        
+        .language-toggle button {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 5px 8px; 
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em; 
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .language-toggle button:hover {
+            background-color: #333;
+        }
+        
+        /* ------------------- تنسيقات زر الإعجاب (القلب) ------------------- */
+        .like-container { 
+            position: absolute; 
+            top: 10px; 
+            z-index: 20; 
+            text-align: center; 
+            cursor: pointer; 
+            padding: 5px; 
+            transition: all 0.3s;
+            color: #333; 
+        }
+
+        [dir="rtl"] .like-container { left: 10px; }
+        [dir="ltr"] .like-container { right: 10px; }
+        
+        .like-container .like-btn {
+            color: #999; 
+            font-size: 1.2em;
+            transition: color 0.3s; 
+        }
+        
+        .like-container .like-btn.liked {
+            color: #FF0050 !important; 
+        }
+
+        .like-container .like-count {
+            font-size: 0.7em; 
+            margin-top: 2px;
+        }
+
+        /* ------------------- شبكة المنتجات وتنسيق البطاقات ------------------- */
+        .products-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            padding: 25px 15px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .product-card { 
+            background-color: white; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); 
+            overflow: hidden; 
+            position: relative; 
+            border: 1px solid #eee; 
+            transition: transform 0.2s;
+        }
+        .product-image-main { width: 100%; height: 260px; object-fit: cover; display: block; border-bottom: 1px solid #eee; cursor: pointer; } 
+        
+        /* ------------------- شارات المنتج (Badges) ------------------- */
+        .product-badges-container { 
+            position: absolute; 
+            top: 10px; 
+            z-index: 10;
+            display: flex; 
+            flex-direction: column; 
+            gap: 5px; 
+        }
+        
+        [dir="rtl"] .product-badges-container { right: 10px; }
+        [dir="ltr"] .product-badges-container { left: 10px; }
+        
+        .product-badges-container span {
+            padding: 5px 10px; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            font-size: 0.8em; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .badge-yellow { background-color: #f1c40f; color: #333; }
+        .badge-black { background-color: #2c3e50; color: white; }
+        
+        .product-price { 
+            font-size: 1.6em; 
+            font-weight: bold; 
+            color: #FF0050 !important; 
+            margin-bottom: 10px; 
+        }
+        
+         .product-card .product-info .size-info { 
+            font-size: 0.9em; 
+            color: #7f8c8d; 
+            margin-bottom: 5px;
+        }
+
+
+        /* ------------------- تصميم الغلاف (البانر) ------------------- */
+        .promo-banner-section { 
+            position: relative; 
+            overflow: hidden; 
+            height: 380px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: linear-gradient(135deg, #1D437F 0%, #2c569b 100%); 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); 
+            padding-bottom: 15px; 
+            display: block; 
+            background-size: cover; 
+            background-position: center;
+        }
+        
+        /* 💥 تنسيق اسم المتجر الرئيسي والخط تحته 💥 */
+        .store-name-container {
+            position: absolute; 
+            top: 25px; 
+            z-index: 25;
+            color: #FFFFFF; 
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        [dir="rtl"] .store-name-container { left: 25px; }
+        [dir="ltr"] .store-name-container { right: 25px; }
+        
+        .store-name-header {
+            display: flex; 
+            align-items: center;
+            line-height: 1; 
+        }
+        
+        .store-name-banner {
+            font-size: 1.5em; 
+            font-weight: 900; 
+            font-style: normal; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+            /* الخط الثلاثي الألوان */
+            display: inline-block;
+            text-decoration: none;
+            background: 
+                linear-gradient(to right, #FFC107 0%, #FFC107 33%, #FF0050 33%, #FF0050 66%, #17A2B8 66%, #17A2B8 100%) 
+                left bottom/100% 3px no-repeat;
+            padding-bottom: 3px; 
+            margin-inline-end: 5px; 
+        }
+        
+        /* 💥 تنسيق أيقونة المثلث والخط الدوار الملون 💥 */
+        .rotating-triangle {
+            font-size: 1.8em; 
+            display: inline-block;
+            position: relative; 
+            padding: 8px; 
+            transform: translateY(2px); 
+            color: transparent; /* إخفاء النص الأصلي */
+        }
+        
+        /* عرض رمز المثلث نفسه */
+        .rotating-triangle::after {
+            content: '\25B2'; /* رمز المثلث لأعلى */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: gold; 
+            font-size: 1em; 
+            line-height: 1; 
+        }
+
+        /* 💥 الخط الدوار الملون (يتم تدويره وتغيير خلفيته) 💥 */
+        .rotating-triangle::before {
+            content: '';
+            position: absolute;
+            top: -5px; 
+            left: -5px; 
+            right: -5px; 
+            bottom: -5px; 
+            border-radius: 50%;
+            border: 3px solid transparent; /* مسافة لحركة الدوران */
+            background-size: 200% 200%;
+            /* تطبيق حركتي الدوران وتغيير اللون معاً */
+            animation: 
+                rotate-border 4s linear infinite,
+                color-change 12s infinite steps(1); /* 4 ثواني لكل لون * 3 ألوان = 12 ثانية دورة كاملة */
+            animation-play-state: running;
+        }
+        
+        /* تعريف الألوان الثلاثة (أصفر، أحمر، أزرق فاتح) */
+        @keyframes color-change {
+            0% { 
+                background: conic-gradient(transparent 0%, #FFC107 10%, transparent 20%, transparent 100%) border-box; /* أصفر */
+            }
+            33% { 
+                background: conic-gradient(transparent 0%, #FF0050 10%, transparent 20%, transparent 100%) border-box; /* أحمر */
+            }
+            66% { 
+                background: conic-gradient(transparent 0%, #17A2B8 10%, transparent 20%, transparent 100%) border-box; /* أزرق فاتح */
+            }
+            100% {
+                background: conic-gradient(transparent 0%, #FFC107 10%, transparent 20%, transparent 100%) border-box; /* العودة للأصفر */
+            }
+        }
+
+        /* مفتاح الإطار للحركة الدائرية (4 ثواني) */
+        @keyframes rotate-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 💥 تنسيق نص الوكيل المعتمد وأيقونة AliExpress 💥 */
+        .authorized-agent-text {
+            font-size: 0.7em; 
+            font-weight: 400; 
+            color: #ecf0f1; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            display: inline-block; 
+            margin-top: 15px; 
+            letter-spacing: 0.5px; 
+            padding-bottom: 2px;
+            border-bottom: 1px solid #000; 
+        }
+
+        .authorized-agent-text i {
+            /* أيقونة AliExpress */
+            font-size: 0.9em;
+            margin-inline-start: 5px;
+            color: #FF5E00; /* لون AliExpress */
+            vertical-align: middle;
+        }
+
+        /* إبقاء باقي التنسيقات كما هي... */
+        .promo-floating-content {
+            position: absolute;
+            top: 35%; 
+            left: 0;
+            right: 0;
+            transform: translateY(-50%); 
+            z-index: 15;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 0 40px; 
+        }
+
+        [dir="rtl"] .promo-floating-content .promo-price-details { text-align: right; }
+        [dir="ltr"] .promo-floating-content .promo-price-details { text-align: left; }
+        [dir="rtl"] .promo-floating-content .promo-action-button { text-align: left; }
+        [dir="ltr"] .promo-floating-content .promo-action-button { text-align: right; }
+        
+        .promo-price-large { 
+            font-size: 1.3em; 
+            font-weight: 900; 
+            color: #FF0050; 
+            line-height: 1.1; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7); 
+            margin-bottom: 5px; 
+        }
+        
+        .promo-floating-content .promo-stars { margin-top: 5px; }
+        
+        .promo-floating-content .promo-stars i {
+            color: #FFC107 !important; 
+            font-size: 0.8em; 
+        }
+
+        .promo-action-button .promo-small-btn {
+            display: inline-block;
+            background-color: #FF0050; 
+            color: white; 
+            padding: 8px 20px; 
+            border-radius: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 0; 
+            box-shadow: 0 3px 6px rgba(255, 0, 80, 0.5);
+            font-size: 0.9em; 
+            transition: all 0.2s; 
+        }
+
+        /* ------------------- المربعات المتحركة السفلية (Promo Cards) ------------------- */
+        .promo-cards-container { 
+            position: absolute; 
+            z-index: 20; 
+            display: flex; 
+            gap: 10px; 
+            padding: 0 20px; 
+            max-width: 1150px; 
+            margin: 0 auto; 
+            bottom: 15px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            width: calc(100% - 40px); 
+            pointer-events: none; 
+        }
+        
+        .promo-card {
+            flex: 1; 
+            height: 120px; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            position: relative; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            pointer-events: auto; 
+            min-width: 100px; 
+            background-color: rgba(255, 255, 255, 0.5); 
+        }
+        
+        .promo-card .new-badge {
+            position: absolute;
+            top: 10px;
+            z-index: 30; 
+            background-color: #FFC107; 
+            color: #333; 
+            font-weight: 700;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        [dir="rtl"] .promo-card .new-badge { right: 10px; left: auto; }
+        [dir="ltr"] .promo-card .new-badge { left: 10px; right: auto; }
+        
+        .promo-card .slider-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .promo-card .slider-item.active { opacity: 1; }
+        
+        .promo-card .slider-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+        
+        /* ------------------ المربع الثابت (Fixed Offer) ------------------ */
+        .promo-card.fixed-offer {
+             flex: 1 0 140px; 
+             min-width: 140px; 
+             overflow: visible; 
+             border-radius: 10px; 
+        }
+
+        .promo-card.fixed-offer .off-amount {
+            color: #FF0050 !important; 
+            font-size: 1.6em; 
+            white-space: nowrap; 
+            display: inline-block; 
+        }
+        
+        .promo-card.fixed-offer .off-amount span {
+            font-size: 0.7em; 
+            font-weight: bold; 
+            display: inline-block; 
+            vertical-align: top; 
+            margin-top: 5px; 
+            margin-inline-start: 5px; 
+        }
+        
+        .promo-card.fixed-offer .promo-button {
+            padding: 3px 8px !important; 
+            background: #FF0050 !important; 
+            color: white !important; 
+            border-radius: 25px !important; 
+            margin-top: 0px; 
+            text-decoration: none; 
+            font-size: 0.65em; 
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(255, 0, 80, 0.6);
+            border: none;
+            transition: all 0.2s; 
+        }
+        
+        .promo-card.fixed-offer > div { 
+            position: absolute !important; 
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 10;
+            display: grid !important; 
+            place-content: center; 
+            align-content: center; 
+            text-align: center; 
+            grid-template-rows: min-content min-content; 
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box; 
+            padding: 5px; 
+            border-radius: 10px; 
+        }
+        
+        /* ------------------- أزرار المنتج (شراء الآن وعرض الصور) ------------------- */
+        .product-actions { 
+            display: flex; 
+            margin-top: 20px;
+            gap: 10px; 
+        }
+        
+        .product-actions .show-images-btn {
+            background-color: #FFC107; 
+            color: #333; 
+            flex-grow: 1; 
+            padding: 8px 15px; 
+            border-radius: 15px; 
+            font-weight: 900; 
+            box-shadow: 0 3px 6px rgba(255, 193, 7, 0.4); 
+            font-size: 0.85em; 
+            border: none; 
+            text-align: center; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s; 
+        }
+        
+        .product-actions .show-images-btn span.text-with-underline {
+             text-decoration: underline;
+             text-decoration-thickness: 2px;
+             text-underline-offset: 4px;
+             text-decoration-color: #333; 
+             margin: 0 5px; 
+        }
+        
+        .product-actions .show-images-btn i {
+             text-decoration: none;
+             margin: 0 5px;
+        }
+        
+
+        .product-actions .buy-now-btn {
+             background-color: #FF0050; 
+             color: white; 
+             flex-grow: 1; 
+             padding: 8px 15px; 
+             border-radius: 15px; 
+             font-weight: 900; 
+             text-align: center; 
+             text-decoration: none; 
+             box-shadow: 0 3px 6px rgba(255, 0, 80, 0.5); 
+             font-size: 0.85em; 
+             transition: all 0.2s; 
+             display: flex; 
+             align-items: center;
+             justify-content: center;
+        }
+        
+        .product-actions .buy-now-btn i { margin: 0 5px; }
+        
+        /* ------------------- زر عرض المزيد ------------------- */
+        .show-more-page-btn {
+            display: none; 
+            width: 150px; 
+            margin: 30px auto 50px auto; 
+            padding: 8px 15px; 
+            border: 2px solid #000; 
+            border-radius: 25px; 
+            background-color: #000; 
+            color: #FFF; 
+            font-size: 0.9em; 
+            font-weight: 500; 
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .show-more-page-btn:hover:not(.disabled-btn) {
+            background-color: #333; 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); 
+            transform: translateY(-2px);
+        }
+
+        .show-more-page-btn.disabled-btn {
+            background-color: #FFF; 
+            color: #000; 
+            border: 2px solid #000; 
+            cursor: default;
+            opacity: 1;
+            font-weight: 500;
+            box-shadow: none; 
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        
+        [dir="rtl"] .show-more-page-btn i { margin-left: 8px; }
+        [dir="ltr"] .show-more-page-btn i { margin-right: 8px; }
+
+        /* ------------------- استعلام وسائط خاص للهواتف ------------------- */
+        @media (max-width: 600px) {
+             .language-toggle { top: 10px; }
+            
+            [dir="rtl"] .language-toggle { right: 10px; left: auto; }
+            [dir="ltr"] .language-toggle { left: 10px; right: auto; }
+
+            .store-name-container { top: 40px; }
+            [dir="rtl"] .store-name-container { left: 15px; }
+            [dir="ltr"] .store-name-container { right: 15px; }
+            
+            .store-name-banner { font-size: 1.0em; }
+            
+            .rotating-triangle { font-size: 1.2em; }
+            
+            .authorized-agent-text { font-size: 0.6em; margin-top: 10px; }
+
+            .promo-floating-content { padding: 0 20px; }
+            
+            .promo-price-large { font-size: 1.2em; }
+            
+            .promo-floating-content .promo-stars i { font-size: 0.7em; }
+            
+            .promo-action-button .promo-small-btn { padding: 6px 15px; font-size: 0.8em; }
+
+            .promo-cards-container { gap: 5px; padding: 0 20px; width: calc(100% - 40px); }
+        
+            .promo-card { min-width: 45px; height: 100px; }
+            
+            .promo-card .new-badge { font-size: 0.65em; padding: 3px 6px; top: 5px; }
+        
+            .promo-card.fixed-offer { flex: 1 0 75px; min-width: 75px; }
+            
+            .promo-card.fixed-offer .off-amount { font-size: 1em; }
+            
+            .promo-card.fixed-offer .off-amount span { font-size: 0.7em; margin-top: 3px; margin-inline-start: 3px; }
+            
+            .promo-card.fixed-offer .off-text { font-size: 0.5em; }
+
+            .promo-card.fixed-offer .promo-button { padding: 3px 8px !important; font-size: 0.7em; }
+
+            .promo-card.fixed-offer > div { padding: 1px 1px; }
+            
+            .show-more-page-btn, .show-more-page-btn.disabled-btn {
+                width: 130px;
+                padding: 6px 10px;
+                font-size: 0.8em;
+                margin: 20px auto 40px auto; 
+            }
+        }
+        /* ------------------- نهاية استعلام وسائط خاص للهواتف ------------------- */
+
+
+    </style>
+</head>
+<body>
+    
+    <div class="language-toggle">
+        <button id="toggleLangBtn" onclick="toggleLanguage()">EN / AR</button>
+    </div>
+    
+    <section class="promo-banner-section" id="promoBannerSection">
+        
+        <div class="store-name-container">
+            <div class="store-name-header">
+                <span class="store-name-banner" id="storeNameBanner"></span>
+                <span class="rotating-triangle"></span>
+            </div>
+            <span class="authorized-agent-text" id="authorizedAgentText"></span>
+        </div>
+        <div class="promo-floating-content">
+            <div class="promo-price-details">
+                <div class="promo-price-large" id="specialProductPrice"></div>
+                <div class="promo-stars" id="specialProductStars"></div>
+            </div>
+            
+            <div class="promo-action-button">
+                <a href="" id="specialProductLink" target="_blank" class="promo-small-btn">
+                    Get new
+                </a>
+            </div>
+        </div>
+
+        <div class="promo-cards-container">
+            
+            <div class="promo-card fixed-offer transparent-promo-card">
+                <img src="" id="fixedOfferImage" alt="Fixed Product" class="fixed-offer-img" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;">
+                    <div class="off-amount" id="fixedOfferAmount" style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;"></div>
+                    <div class="off-text" id="fixedOfferText" style="color: #333;"></div>
+                    
+                    <a href="" id="getNowLink" target="_blank" class="promo-button">
+                        Get Now 
+                    </a>
+                </div>
+            </div>
+            
+            <div class="promo-card" id="promoItem1">
+                </div>
+            
+            <div class="promo-card" id="promoItem2">
+                 </div>
+            
+        </div>
+        
+    </section>
+
+    <main class="products-container">
+        <div class="products-grid" id="categoryBlocksContainer">
+            </div>
+    </main>
+    
+    <button class="show-more-page-btn" id="loadMoreBtn" onclick="loadProducts()">
+        <i class="fas fa-arrow-down"></i> <span id="loadMoreText">عرض المزيد</span>
+    </button>
+    
+    <script>
+        /* ====================================================================================
+           *** 🔑 منطقة التعديل الرئيسية - قم بتغيير البيانات هنا فقط 🔑 ***
+           ==================================================================================== */
+        
+        const PRODUCTS_PER_LOAD = 12; 
+        
+        let storeSettings = {
+            name: 'Walmart Shopping', 
+            faviconUrl: 'https://via.placeholder.com/16x16?text=W',
+        };
+
+        let bannerData = {
+            backgroundUrl: 'https://picsum.photos/1600/400?random=big-special-product', 
+            specialProduct: {
+                price: '$199.99', 
+                rating: 3.5, 
+                link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20special%20deal' 
+            },
+            fixedOffer: {
+                imageUrl: 'https://picsum.photos/300/300?random=fixed-offer-img', 
+                amount_ar: '$390 <span>خصم</span>', 
+                amount_en: '$390 <span>OFF</span>', 
+                text_ar: 'على كوبونات الخصم', 
+                text_en: 'in coupon codes', 
+                link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20this%20offer' 
+            },
+            item1: [ 
+                { url: 'https://picsum.photos/800/800?random=shoe', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20shoe' }, 
+                { url: 'https://picsum.photos/800/800?random=perfume', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20perfume' }, 
+                { url: 'https://picsum.photos/800/800?random=earring', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20earring' }, 
+            ],
+            item2: [ 
+                { url: 'https://picsum.photos/800/800?random=lipstick', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20lipstick' }, 
+                { url: 'https://picsum.photos/800/800?random=patch', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20patch' }, 
+                { url: 'https://picsum.photos/800/800?random=brush', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20brush' }, 
+            ]
+        };
+
+        let productsData = [
+          { id: 101, name_ar: 'فستان نسائي أنيق وراقي', name_en: 'Elegant Women Dress', code: 'F7RR', price: 24.90, rating: 4.9, soldCount: 125000, likesCount: 1250, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20فستان%20F7RR', link_en: 'https://s.click.aliexpress.com/e/_ExmCilS', sizes_ar: 'S, M, L, XL', sizes_en: 'S, M, L, XL', badgeYellow_ar: 'Choice', badgeYellow_en: 'Choice', badgeBlack_ar: 'Black Friday', badgeBlack_en: 'Black Friday', images: ['https://i.imgur.com/YaiMb4S.jpeg'] }, 
+          { id: 102, name_ar: 'جاكيت جينز عصري', name_en: 'Modern Denim Jacket', code: 'J8KK', price: 35.50, rating: 4.5, soldCount: 20000, likesCount: 300, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20جاكيت%20J8KK', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20J8KK', sizes_ar: 'M, L', sizes_en: 'M, L', badgeYellow_ar: 'جديد', badgeYellow_en: 'New', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1011/800/800'] },
+          { id: 103, name_ar: 'ساعة يد رقمية فاخرة', name_en: 'Luxury Digital Watch', code: 'W900', price: 120.00, rating: 4.8, soldCount: 5000, likesCount: 950, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20ساعة%20W900', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20W900', sizes_ar: 'متاح', sizes_en: 'Available', badgeYellow_ar: 'عرض خاص', badgeYellow_en: 'Special Offer', badgeBlack_ar: 'توصيل مجاني', badgeBlack_en: 'Free Shipping', images: ['https://picsum.photos/id/10/800/800'] },
+          { id: 104, name_ar: 'حقيبة ظهر رياضية', name_en: 'Sports Backpack', code: 'B4P', price: 45.99, rating: 4.2, soldCount: 15000, likesCount: 600, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20حقيبة%20B4P', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20B4P', sizes_ar: 'كبير', sizes_en: 'Large', badgeYellow_ar: 'الأكثر مبيعًا', badgeYellow_en: 'Bestseller', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1015/800/800'] },
+          { id: 105, name_ar: 'حذاء رياضي مريح للجري', name_en: 'Comfortable Running Shoes', code: 'SH01', price: 89.99, rating: 4.6, soldCount: 7500, likesCount: 450, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20حذاء%20SH01', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20SH01', sizes_ar: '40, 41, 42, 43', sizes_en: '40, 41, 42, 43', badgeYellow_ar: 'New Arrival', badgeYellow_en: 'New Arrival', badgeBlack_ar: 'خصم', badgeBlack_en: 'Discount', images: ['https://picsum.photos/id/1023/800/800'] },
+          { id: 106, name_ar: 'مجموعة مكياج فاخرة كاملة', name_en: 'Luxury Full Makeup Set', code: 'MK02', price: 150.00, rating: 4.9, soldCount: 2000, likesCount: 800, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20مجموعة%20MK02', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20MK02', sizes_ar: 'ألوان متعددة', sizes_en: 'Multi Colors', badgeYellow_ar: 'Exclusive', badgeYellow_en: 'Exclusive', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1024/800/800'] },
+          { id: 107, name_ar: 'سماعات بلوتوث لاسلكية', name_en: 'Wireless Bluetooth Headphones', code: 'HP03', price: 59.00, rating: 4.7, soldCount: 30000, likesCount: 1500, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20سماعات%20HP03', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20HP03', sizes_ar: 'أبيض, أسود', sizes_en: 'White, Black', badgeYellow_ar: 'توصيل سريع', badgeYellow_en: 'Fast Shipping', badgeBlack_ar: 'Top Rated', badgeBlack_en: 'Top Rated', images: ['https://picsum.photos/id/1036/800/800'] },
+          { id: 108, name_ar: 'قميص صيفي قطني رجالي', name_en: 'Men\'s Summer Cotton Shirt', code: 'CS04', price: 29.99, rating: 4.4, soldCount: 18000, likesCount: 250, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20قميص%20CS04', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20CS04', sizes_ar: 'M, L, XL, XXL', sizes_en: 'M, L, XL, XXL', badgeYellow_ar: '', badgeYellow_en: '', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1040/800/800'] },
+          { id: 109, name_ar: 'إكسسوار سيارة متعدد الوظائف', name_en: 'Multi-function Car Accessory', code: 'AC05', price: 19.50, rating: 4.1, soldCount: 5000, likesCount: 100, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20إكسسوار%20AC05', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20AC05', sizes_ar: 'حجم واحد', sizes_en: 'One Size', badgeYellow_ar: 'الأقل سعراً', badgeYellow_en: 'Lowest Price', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1041/800/800'] },
+          { id: 110, name_ar: 'فستان سهرة طويل للنساء', name_en: 'Long Evening Dress for Women', code: 'DR06', price: 99.00, rating: 4.7, soldCount: 1200, likesCount: 700, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20فستان%20DR06', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20DR06', sizes_ar: 'S, M, L', sizes_en: 'S, M, L', badgeYellow_ar: 'عرض نهاية الأسبوع', badgeYellow_en: 'Weekend Offer', badgeBlack_ar: 'جديد', badgeBlack_en: 'New', images: ['https://picsum.photos/id/1047/800/800'] },
+          { id: 111, name_ar: 'كاميرا تصوير احترافية', name_en: 'Professional Camera', code: 'CM07', price: 450.00, rating: 5.0, soldCount: 500, likesCount: 300, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20كاميرا%20CM07', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20CM07', sizes_ar: 'أسود', sizes_en: 'Black', badgeYellow_ar: 'Choice', badgeYellow_en: 'Choice', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1050/800/800'] },
+          { id: 112, name_ar: 'سروال جينز ضيق نسائي', name_en: 'Women\'s Skinny Jeans', code: 'JN08', price: 39.99, rating: 4.3, soldCount: 9000, likesCount: 200, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20سروال%20JN08', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20JN08', sizes_ar: '30, 32, 34', sizes_en: '30, 32, 34', badgeYellow_ar: '', badgeYellow_en: '', badgeBlack_ar: 'تخفيض', badgeBlack_en: 'Sale', images: ['https://picsum.photos/id/1051/800/800'] },
+          
+          /* تكرار المنتجات لضمان عمل زر "عرض المزيد" (المنتجات 13-18) */
+          { id: 113, name_ar: 'عطر رجالي يدوم طويلاً', name_en: 'Long Lasting Men\'s Perfume', code: 'PR09', price: 65.00, rating: 4.9, soldCount: 1500, likesCount: 650, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20عطر%20PR09', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20PR09', sizes_ar: 'حجم 100 مل', sizes_en: '100ml Size', badgeYellow_ar: 'هدايا مجانية', badgeYellow_en: 'Free Gifts', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1054/800/800'] },
+          { id: 114, name_ar: 'منظم مكتبي خشبي أنيق', name_en: 'Elegant Wooden Desk Organizer', code: 'OR10', price: 32.75, rating: 4.5, soldCount: 4000, likesCount: 150, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20منظم%20OR10', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20OR10', sizes_ar: 'بني فاتح', sizes_en: 'Light Brown', badgeYellow_ar: 'جديد', badgeYellow_en: 'New', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1058/800/800'] },
+          { id: 115, name_ar: 'حذاء رياضي مريح للجري', name_en: 'Comfortable Running Shoes', code: 'SH01-B', price: 89.99, rating: 4.6, soldCount: 7500, likesCount: 450, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20حذاء%20SH01-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20SH01-B', sizes_ar: '40, 41, 42, 43', sizes_en: '40, 41, 42, 43', badgeYellow_ar: 'New Arrival', badgeYellow_en: 'New Arrival', badgeBlack_ar: 'خصم', badgeBlack_en: 'Discount', images: ['https://picsum.photos/id/1062/800/800'] },
+          { id: 116, name_ar: 'مجموعة مكياج فاخرة كاملة', name_en: 'Luxury Full Makeup Set', code: 'MK02-B', price: 150.00, rating: 4.9, soldCount: 2000, likesCount: 800, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20مجموعة%20MK02-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20MK02-B', sizes_ar: 'ألوان متعددة', sizes_en: 'Multi Colors', badgeYellow_ar: 'Exclusive', badgeYellow_en: 'Exclusive', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1066/800/800'] },
+          { id: 117, name_ar: 'سماعات بلوتوث لاسلكية', name_en: 'Wireless Bluetooth Headphones', code: 'HP03-B', price: 59.00, rating: 4.7, soldCount: 30000, likesCount: 1500, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20سماعات%20HP03-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20HP03-B', sizes_ar: 'أبيض, أسود', sizes_en: 'White, Black', badgeYellow_ar: 'توصيل سريع', badgeYellow_en: 'Fast Shipping', badgeBlack_ar: 'Top Rated', badgeBlack_en: 'Top Rated', images: ['https://picsum.photos/id/1067/800/800'] },
+          { id: 118, name_ar: 'قميص صيفي قطني رجالي', name_en: 'Men\'s Summer Cotton Shirt', code: 'CS04-B', price: 29.99, rating: 4.4, soldCount: 18000, likesCount: 250, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20قميص%20CS04-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20CS04-B', sizes_ar: 'M, L, XL, XXL', sizes_en: 'M, L, XL, XXL', badgeYellow_ar: 'مخفض', badgeYellow_en: 'Reduced', badgeBlack_ar: 'صيفي', badgeBlack_en: 'Summer', images: ['https://picsum.photos/id/1068/800/800'] },
+        ];
+
+        /* ====================================================================================
+           *** 💡 منطقة وظائف العمليات - لا تحتاج للتعديل هنا 💡 ***
+           ==================================================================================== */
+
+        let currentLang = 'ar'; 
+        let currentProductIndex = 0; 
+        
+        let promoCardIndex1 = 0;
+        let promoCardIndex2 = 0;
+        let slideshowIntervals = {}; 
+
+        // ------------------ وظائف مساعدة ------------------
+
+        function formatCount(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + (currentLang === 'ar' ? ' ألف' : 'K');
+            }
+            return num;
+        }
+
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            let starsHtml = '';
+            for (let i = 0; i < fullStars; i++) {
+                starsHtml += '<i class="fas fa-star"></i>';
+            }
+            if (halfStar) {
+                starsHtml += '<i class="fas fa-star-half-alt"></i>';
+            }
+            for (let i = 0; i < (5 - fullStars - (halfStar ? 1 : 0)); i++) {
+                starsHtml += '<i class="far fa-star"></i>';
+            }
+            return starsHtml;
+        }
+
+        // ------------------ إنشاء بطاقة المنتج ------------------
+        function createProductCard(product) {
+            const productName = currentLang === 'ar' ? product.name_ar : product.name_en;
+            const productSizes = currentLang === 'ar' ? product.sizes_ar : product.sizes_en;
+            const productLink = currentLang === 'ar' ? product.link_ar : product.link_en; 
+            const badgeYellow = currentLang === 'ar' ? product.badgeYellow_ar : product.badgeYellow_en;
+            const badgeBlack = currentLang === 'ar' ? product.badgeBlack_ar : product.badgeBlack_en;
+            
+            const buyText = currentLang === 'ar' 
+                ? `<i class="fas fa-credit-card"></i> شراء الآن` 
+                : `<i class="fas fa-credit-card"></i> Buy Now`;
+                
+            const showImagesText = currentLang === 'ar' 
+                ? `<i class="fas fa-images"></i> <span class="text-with-underline">عرض الصور</span>` 
+                : `<i class="fas fa-images"></i> <span class="text-with-underline">View Images</span>`; 
+                
+            const soldText = currentLang === 'ar' ? 'تم بيع' : 'Sold';
+
+            // النقطة المهمة: الحصول على أول صورة من مصفوفة images
+            const mainImageUrl = product.images.length > 0 ? product.images[0] : `https://via.placeholder.com/800x800?text=No+Image+ID:${product.id}`;
+
+            let badgesHtml = '';
+            if (badgeYellow) {
+                badgesHtml += `<span class="badge-yellow">${badgeYellow}</span>`;
+            }
+            if (badgeBlack) {
+                badgesHtml += `<span class="badge-black">${badgeBlack}</span>`;
+            }
+            
+            const isLiked = false; 
+            const likeClass = isLiked ? 'liked' : '';
+            const likeIcon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+            
+            const card = `
+                <div class="product-card" data-product-id="${product.id}">
+                    <div class="product-badges-container">
+                        ${badgesHtml}
+                    </div>
+                    
+                    <div class="like-container" onclick="toggleLike(${product.id})">
+                        <i class="like-btn ${likeIcon} ${likeClass}"></i>
+                        <div class="like-count">${formatCount(product.likesCount)}</div>
+                    </div>
+
+                    <img src="${mainImageUrl}" alt="${productName}" class="product-image-main">
+                    
+                    <div class="product-info" style="padding: 15px;">
+                        <h3 class="product-name" style="font-size: 1.1em; margin: 0 0 5px 0; font-weight: 600; min-height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${productName}</h3>
+                        
+                        <div class="product-meta" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <div class="product-rating" style="color: #FFC107;">
+                                ${generateStars(product.rating)}
+                                <span style="font-size: 0.8em; color: #555; margin-left: 5px;">(${product.rating})</span>
+                            </div>
+                            <div class="product-sold" style="font-size: 0.8em; color: #7f8c8d;">
+                                ${soldText} ${formatCount(product.soldCount)}
+                            </div>
+                        </div>
+
+                        <div class="size-info">${productSizes}</div>
+                        <div class="product-price">${product.price.toFixed(2)}$</div>
+                        
+                        <div class="product-actions">
+                            <a href="${productLink}" target="_blank" class="buy-now-btn">${buyText}</a>
+                            <a href="${productLink}" target="_blank" class="show-images-btn">${showImagesText}</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // ------------------ وظيفة التبديل التلقائي للصور (Slideshow) ------------------
+        function updatePromoCard(elementId, items, currentIndex) {
+            const container = document.getElementById(elementId);
+            if (!container || items.length === 0) return 0;
+            
+            const newBadgeText = currentLang === 'ar' ? 'جديد' : 'New';
+            
+            if (!container.querySelector('.new-badge')) {
+                container.innerHTML = `<span class="new-badge">${newBadgeText}</span>` + 
+                    items.map((item, index) => `
+                        <a href="${item.link}" target="_blank" class="slider-item ${index === 0 ? 'active' : ''}">
+                            <img src="${item.url}" alt="Promo Item ${index + 1}" loading="lazy">
+                        </a>
+                    `).join('');
+            } else {
+                 container.querySelector('.new-badge').textContent = newBadgeText;
+            }
+
+            const slides = container.querySelectorAll('.slider-item');
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            let nextIndex = (currentIndex) % items.length;
+            slides[nextIndex].classList.add('active');
+
+            return nextIndex; 
+        }
+
+        function startPromoSlideshows() {
+            Object.values(slideshowIntervals).forEach(clearInterval);
+            slideshowIntervals = {};
+            
+            promoCardIndex1 = 0;
+            promoCardIndex2 = 0;
+            
+            promoCardIndex1 = updatePromoCard('promoItem1', bannerData.item1, promoCardIndex1);
+            promoCardIndex2 = updatePromoCard('promoItem2', bannerData.item2, promoCardIndex2);
+            
+            slideshowIntervals.item1 = setInterval(() => {
+                promoCardIndex1 = (promoCardIndex1 + 1) % bannerData.item1.length;
+                updatePromoCard('promoItem1', bannerData.item1, promoCardIndex1);
+            }, 4000); 
+
+            slideshowIntervals.item2 = setInterval(() => {
+                promoCardIndex2 = (promoCardIndex2 + 1) % bannerData.item2.length;
+                updatePromoCard('promoItem2', bannerData.item2, promoCardIndex2);
+            }, 4000); 
+        }
+        
+        // ------------------ تحميل المزيد من المنتجات (الرقم 6 غير موجود هنا) ------------------
+        function loadProducts(reset = false) {
+            const container = document.getElementById('categoryBlocksContainer');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            const loadMoreText = document.getElementById('loadMoreText');
+            
+            if (reset) {
+                container.innerHTML = '';
+                currentProductIndex = 0; 
+            }
+            
+            const remainingProducts = productsData.slice(currentProductIndex);
+            const productsToLoad = remainingProducts.slice(0, PRODUCTS_PER_LOAD); 
+
+            productsToLoad.forEach(product => {
+                container.innerHTML += createProductCard(product);
+            });
+
+            currentProductIndex += productsToLoad.length;
+            
+            if (currentProductIndex < productsData.length) {
+                loadMoreBtn.style.display = 'block'; 
+                loadMoreBtn.classList.remove('disabled-btn');
+
+                // 💥 تم التأكد من أن النص يظهر "عرض المزيد" فقط بدون أي رقم 💥
+                const moreTxt = currentLang === 'ar' ? `عرض المزيد` : `Load More`;
+                loadMoreText.textContent = moreTxt;
+                
+            } else if (productsData.length > PRODUCTS_PER_LOAD) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.classList.add('disabled-btn');
+                loadMoreText.textContent = currentLang === 'ar' ? 'تم عرض جميع المنتجات' : 'All Products Shown';
+            } else {
+                 loadMoreBtn.style.display = 'none'; 
+            }
+        }
+        
+        // ------------------ تبديل حالة الإعجاب ------------------
+        function toggleLike(productId) {
+            const product = productsData.find(p => p.id === productId);
+            if (product) {
+                const likeBtn = document.querySelector(`.product-card[data-product-id="${productId}"] .like-btn`);
+                const likeCountDiv = document.querySelector(`.product-card[data-product-id="${productId}"] .like-count`);
+
+                if (likeBtn.classList.contains('liked')) {
+                    likeBtn.classList.remove('liked', 'fas');
+                    likeBtn.classList.add('far');
+                    product.likesCount -= 1; 
+                } else {
+                    likeBtn.classList.add('liked', 'fas');
+                    likeBtn.classList.remove('far');
+                    product.likesCount += 1; 
+                }
+                likeCountDiv.textContent = formatCount(product.likesCount);
+            }
+        }
+
+        // ------------------ تحديث عناصر البانر (غير السلايدر) ------------------
+        function updateStaticBannerContent() {
+            const specialProductData = bannerData.specialProduct;
+            const fixedOfferData = bannerData.fixedOffer;
+            
+            document.getElementById('promoBannerSection').style.backgroundImage = `url('${bannerData.backgroundUrl}')`;
+            
+            // 💥 التعديل الرئيسي على اسم المتجر ونص الوكيل - تضمين أيقونة AliExpress 💥
+            document.getElementById('storeNameBanner').textContent = storeSettings.name;
+            document.getElementById('storeTitle').textContent = storeSettings.name;
+            
+            // أيقونة AliExpress
+            const agentTextContent = currentLang === 'ar' 
+                ? 'وكيل معتمد لمتجر AliExpress <i class="fab fa-aliexpress-square"></i>' 
+                : 'Authorized agent for AliExpress store <i class="fab fa-aliexpress-square"></i>';
+                
+            document.getElementById('authorizedAgentText').innerHTML = agentTextContent;
+            
+            document.getElementById('specialProductPrice').innerHTML = specialProductData.price;
+            document.getElementById('specialProductStars').innerHTML = generateStars(specialProductData.rating);
+            document.getElementById('specialProductLink').href = specialProductData.link;
+            document.getElementById('specialProductLink').textContent = currentLang === 'ar' ? 'احصل على الجديد' : 'Get new';
+            
+            document.getElementById('fixedOfferImage').src = fixedOfferData.imageUrl;
+            document.getElementById('fixedOfferAmount').innerHTML = currentLang === 'ar' ? fixedOfferData.amount_ar : fixedOfferData.amount_en;
+            document.getElementById('fixedOfferText').textContent = currentLang === 'ar' ? fixedOfferData.text_ar : fixedOfferData.text_en; 
+            
+            document.getElementById('getNowLink').href = fixedOfferData.link;
+            document.getElementById('getNowLink').textContent = currentLang === 'ar' ? 'احصل الآن' : 'Get Now';
+        }
+
+        // ------------------ وظيفة تبديل اللغة وإعادة تحميل جميع المكونات ------------------
+        function setLanguageAndReload(lang) {
+             currentLang = lang; 
+             const dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+             
+             document.documentElement.lang = currentLang;
+             document.documentElement.dir = dir;
+             document.body.style.direction = dir; 
+             
+             document.getElementById('toggleLangBtn').textContent = currentLang === 'ar' ? 'EN' : 'AR';
+             
+             document.getElementById('favicon').href = storeSettings.faviconUrl;
+
+             updateStaticBannerContent();
+             startPromoSlideshows();
+
+             loadProducts(true); 
+        }
+        
+        // ------------------ وظيفة التبديل اليدوي ------------------
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguageAndReload(newLang);
+        }
+        
+        // ------------------ وظيفة التهيئة عند تحميل الصفحة ------------------
+        function initializeStore() {
+             const userLang = navigator.language.toLowerCase();
+             const initialLang = userLang.startsWith('ar') ? 'ar' : 'en'; 
+             
+             document.getElementById('toggleLangBtn').textContent = '...'; 
+             
+             setLanguageAndReload(initialLang);
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeStore);
+
+    </script>
+</body>
+      </html>
