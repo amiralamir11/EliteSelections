@@ -1310,11 +1310,8 @@
             const labels = {
                 // Modal الإضافة
                 categoryLabelText: { ar: 'الفئة:', en: 'Category:' },
-                // 💡 عودة إلى النص الأساسي (لأنه لم يعد مطلوباً إدخال ترجمة)
                 nameArLabelText: { ar: 'اسم المنتج:', en: 'Product Name:' }, 
                 sizesArLabelText: { ar: 'الألوان والمقاسات:', en: 'Colors and Sizes:' }, 
-                // ❌ إزالة التسميات الإنجليزية الجديدة
-                
                 priceLabelText: { ar: 'السعر (بالدولار $):', en: 'Price (in $):' },
                 imagesLinkLabelText: { ar: 'رابط الصور (زر عرض الصور):', en: 'Images Link (View Images button):' },
                 linkLabelText: { ar: 'رابط الشراء (زر شراء الآن):', en: 'Purchase Link (Buy Now button):' },
@@ -1322,7 +1319,6 @@
                 
                 // Placeholder
                  productSizesAr: { ar: 'مثال: للأعمار 3-8 سنوات، ألوان متعددة', en: 'Example: Ages 3-8, Multi Colors' },
-                 // ❌ تم إزالة البلايس هولدر الإنجليزي
                  passwordInput: { ar: 'كلمة المرور لتنفيذ الإدراج', en: 'Enter Password to Insert' },
                  
                  // Modal التواصل
@@ -1360,7 +1356,7 @@
             document.getElementById('categoriesTitle').textContent = currentLang === 'ar' ? 'تصفح الفئات:' : 'Browse Categories:';
             document.getElementById('modalTitle').textContent = currentLang === 'ar' ? 'إضافة منتج جديد' : 'Add New Product';
             
-            // 💡 جديد: تحديث نصوص شريط الـ Sidebar العلوي
+            // 💡 تحديث نصوص شريط الـ Sidebar العلوي
             document.getElementById('sidebarUsername').textContent = currentLang === 'ar' ? 'لوحة تحكم المتجر' : 'Store Control Panel';
             document.getElementById('sidebarStatus').textContent = currentLang === 'ar' ? 'وضع الإدارة' : 'Admin Mode';
             document.getElementById('contactText').textContent = currentLang === 'ar' ? 'تواصل' : 'Contact';
@@ -1381,26 +1377,29 @@
             container.innerHTML = ''; // تنظيف الحاوية
             
             const categoriesMap = currentLang === 'ar' ? CATEGORIES_AR : CATEGORIES_EN;
-            const allCategories = { ...categoriesMap }; 
+            // إضافة "جميع المنتجات/All Products" أولاً
+            const allCategories = { 'all': categoriesMap['all'], ...categoriesMap }; 
 
             for (const key in allCategories) {
-                const link = document.createElement('a');
-                link.href = "#";
-                link.className = 'category-link';
-                link.setAttribute('data-category', key);
-                link.textContent = allCategories[key];
+                if(key === 'all' || CATEGORIES_AR.hasOwnProperty(key)) { // تحقق من وجود الفئة في القائمة العربية أيضاً
+                    const link = document.createElement('a');
+                    link.href = "#";
+                    link.className = 'category-link';
+                    link.setAttribute('data-category', key);
+                    link.textContent = allCategories[key];
 
-                link.addEventListener('click', function(e) {
-                     e.preventDefault();
-                     filterProducts(this.getAttribute('data-category'));
-                });
-                
-                // تعيين الفئة النشطة بشكل صحيح عند الإنشاء
-                if (key === currentCategory) {
-                    link.classList.add('active-category');
+                    link.addEventListener('click', function(e) {
+                         e.preventDefault();
+                         filterProducts(this.getAttribute('data-category'));
+                    });
+                    
+                    // تعيين الفئة النشطة بشكل صحيح عند الإنشاء
+                    if (key === currentCategory) {
+                        link.classList.add('active-category');
+                    }
+
+                    container.appendChild(link);
                 }
-
-                container.appendChild(link);
             }
         }
         
@@ -1418,7 +1417,7 @@
              // 💡 تحديث وإعادة بناء الروابط عند تغيير اللغة
              createCategoryLinks(); 
              
-             // 🟢 التأكد من تحديث القائمة النشطة عند تغيير اللغة
+             // 🟢 التأكد من تحديث القائمة النشطة عند تغيير اللغة وإعادة تحميل المنتجات
              filterProducts(currentCategory, false); 
              
              localStorage.setItem('siteLang', currentLang);
@@ -1667,9 +1666,11 @@
             product.isLiked = storedIsLiked;
             product.likesCount = storedLikesCount;
             
+            // 🟢 الإصلاح: استخدام المتغيرات الإنجليزية بشكل صحيح عند تفعيل اللغة الإنجليزية
             const productName = currentLang === 'ar' ? product.name_ar : product.name_en;
             const productSizes = currentLang === 'ar' ? product.sizes_ar : product.sizes_en;
             const productLink = currentLang === 'ar' ? product.link_ar : product.link_en; 
+            
             // 💡 تحسين: استخدام الرابط الثاني كـ "عرض الصور" إذا كان متاحاً
             const productImagesLink = product.images.length > 1 ? product.images[1] : productLink; 
 
@@ -1821,6 +1822,7 @@
             if(passwordInput) {
                 passwordInput.value = '';
                 passwordInput.classList.remove('error');
+                passwordInput.placeholder = currentLang === 'ar' ? 'كلمة المرور لتنفيذ الإدراج' : 'Enter Password to Insert';
             }
         }
         
@@ -1843,21 +1845,17 @@
             const productNameAr = document.getElementById('productNameAr').value;
             const productSizesAr = document.getElementById('productSizesAr').value;
 
-            // 💡 الإزالة: لم نعد نسترد القيم الإنجليزية من حقول الإدخال
-
             const productImageUrl = document.getElementById('productImageUrl').value;
             const productPrice = parseFloat(document.getElementById('productPrice').value);
             const productLink = document.getElementById('productLink').value;
             const productImagesLink = document.getElementById('productImagesLink').value; 
             
-
-
+            // 🟢 هنا يتم النسخ التلقائي للبيانات العربية في الحقول الإنجليزية
             const newProduct = {
-                id: nextProductId++, // استخدم الـ ID التالي
+                id: nextProductId++, 
                 category: categoryValue,
                 name_ar: productNameAr,
-                // 🟢 نسخ القيمة العربية للحقل الإنجليزي تلقائياً
-                name_en: productNameAr, 
+                name_en: productNameAr, // النسخ التلقائي
                 code: 'NEW' + (nextProductId - 1),
                 price: productPrice,
                 rating: 5.0, 
@@ -1867,10 +1865,8 @@
                 link_ar: productLink,
                 link_en: productLink,
                 sizes_ar: productSizesAr,
-                // 🟢 نسخ المقاسات العربية للمقاسات الإنجليزية تلقائياً
-                sizes_en: productSizesAr, 
+                sizes_en: productSizesAr, // النسخ التلقائي
                 badgeYellow_ar: CATEGORIES_AR[categoryValue] || categoryValue,
-                // 🟢 يجب استخدام الترجمة الإنجليزية للفئة إن أمكن
                 badgeYellow_en: CATEGORIES_EN[categoryValue] || categoryValue, 
                 badgeBlack_ar: 'منتج مُضاف',
                 badgeBlack_en: 'Added Item',
