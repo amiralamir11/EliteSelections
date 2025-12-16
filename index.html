@@ -91,9 +91,9 @@
 
         /* ------------------- القائمة الجانبية (Sidebar) - أنماط محسّنة ------------------- */
         .sidebar {
-            /* 🚨 التعديلات ليتوقف الارتفاع عند نهاية المحتوى */
-            height: auto; /* يجعل الارتفاع يعتمد على المحتوى الداخلي */
-            max-height: 100vh; /* يمنعها من تجاوز ارتفاع الشاشة إذا كان المحتوى كبيراً */
+            /* 🚨 أهم نقطة هنا هي width: 0; لتبدأ مخفية وتمنع الوميض */
+            height: auto; 
+            max-height: 100vh; 
             width: 0;
             position: fixed;
             z-index: 2000;
@@ -101,9 +101,8 @@
             right: 0; /* يبدأ من اليمين لـ RTL */
             background-color: #2c3e50; /* لون غامق أنيق */
             overflow-x: hidden;
-            /* تم إزالة overflow-y: auto هنا ونقله إلى .category-links-container */
-            transition: 0.3s;
-            padding-bottom: 20px; /* إضافة مسافة سفلية */
+            transition: 0.3s; /* هذا الانتقال يعمل فقط عندما يتم تغيير الـ width في JavaScript */
+            padding-bottom: 20px; 
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);
             color: var(--white-color);
             display: flex;
@@ -135,10 +134,10 @@
         /* 💡 جديد: شريط معلومات المستخدم/الإدارة في الأعلى */
         .sidebar-header {
             padding: 20px 25px 10px;
-            padding-top: 70px; /* تم التعديل لإضافة مسافة من الأعلى بدلاً من margin-top: -60px; */
-            background-color: #34495e; /* لون أغمق قليلاً */
+            padding-top: 70px; 
+            background-color: #34495e; 
             text-align: center;
-            border-bottom: 2px solid var(--primary-color); /* خط فاصل مميز */
+            border-bottom: 2px solid var(--primary-color); 
             flex-shrink: 0;
         }
 
@@ -214,7 +213,7 @@
         /* 💡 تحسين تنسيق الفئات */
         .sidebar .category-links-container {
             flex-grow: 1; 
-            overflow-y: auto; /* السماح بالتمرير إذا كان المحتوى طويلاً */
+            overflow-y: auto; 
             margin-bottom: 10px;
             padding-top: 5px;
         }
@@ -1253,14 +1252,12 @@
            *** 💡 منطقة وظائف العمليات والتحسينات الجديدة 💡 ***
            ------------------------------------------------------------------------------------ */
 
-        let productsData = []; // 💡 سيتم ملؤها من LocalStorage أو ORIGINAL_PRODUCTS_DATA
+        let productsData = []; 
         let currentLang = 'ar'; 
         let currentProductIndex = 0; 
         let currentCategory = 'all'; 
         let filteredProducts = [];
-        let nextProductId = 0; // سيتم تعيينه ديناميكياً
-
-        // 🟢 متغير جديد لتتبع حالة التحقق من كلمة المرور
+        let nextProductId = 0; 
         let isPasswordCorrect = false;
         
         // ------------------ وظائف مساعدة عامة ------------------
@@ -1295,14 +1292,12 @@
             return starsHtml;
         }
         
-        // 💡 وظيفة لحفظ البيانات في LocalStorage
         function saveProductsToLocalStorage() {
              localStorage.setItem('storedProducts', JSON.stringify(productsData));
         }
         
         // ------------------ وظائف إدارة اللغة ------------------
         
-        // 🟢 تحديث نصوص حقول الإضافة/التواصل
         function updateModalLabels() {
             const labels = {
                 // Modal الإضافة
@@ -1425,11 +1420,13 @@
         // ------------------ وظائف القائمة الجانبية (Sidebar) ------------------
 
         function openNav() {
-            document.getElementById("mySidebar").style.width = "250px";
+            // 🚨 يتم تغيير العرض هنا إلى 250px ليظهر
+            document.getElementById("mySidebar").style.width = "250px"; 
         }
 
         function closeNav() {
-            document.getElementById("mySidebar").style.width = "0";
+            // 🚨 يتم تغيير العرض هنا إلى 0 ليختفي
+            document.getElementById("mySidebar").style.width = "0"; 
         }
 
         // ------------------ وظيفة فلترة المنتجات حسب الفئة (مُعدلة) ------------------
